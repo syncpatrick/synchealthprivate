@@ -11,10 +11,23 @@ export type NavLink = {
   hasDropdown?: boolean;
 };
 
+export type NavSubLink = {
+  label: string;
+  href: string;
+};
+
+export type ProtocolCategory = {
+  label: string;
+  moreHref?: string;
+  children: NavSubLink[];
+};
+
 export type SiteHeaderContent = {
   /** Alternating messages shown in the top ticker bar. */
   tickerMessages: string[];
   navLinks: NavLink[];
+  resourcesEyebrow?: string;
+  protocolCategories?: ProtocolCategory[];
   loginLabel: string;
   loginHref: string;
   ctaLabel: string;
@@ -441,6 +454,71 @@ export type ProductContent = {
   testimonials?: TestimonialsContent;
 };
 
+export const defaultProtocolCategories: ProtocolCategory[] = [
+  {
+    label: "Recovery",
+    moreHref: "/start?category=recovery",
+    children: [
+      { label: "BPC-157", href: "/products/bpc-157" },
+      { label: "DSIP", href: "/products/dsip" },
+      { label: "REPAIR", href: "/products/repair" },
+      { label: "TB-500", href: "/products/tb-500" },
+      { label: "REBUILD", href: "/products/rebuild" },
+    ],
+  },
+  {
+    label: "Performance",
+    moreHref: "/start?category=performance",
+    children: [
+      { label: "Sermorelin", href: "/products/sermorelin" },
+      { label: "PERFORM", href: "/products/perform" },
+    ],
+  },
+  {
+    label: "Metabolic",
+    moreHref: "/start?category=metabolic",
+    children: [
+      { label: "MOTS-C", href: "/products/mots-c" },
+      { label: "DEFINE", href: "/products/define" },
+      { label: "Tesamorelin", href: "/products/tesamorelin" },
+    ],
+  },
+  {
+    label: "Weight",
+    moreHref: "/start?category=weight",
+    children: [
+      { label: "Compounded Semaglutide", href: "/products/semaglutide" },
+      { label: "Compounded Tirzepatide", href: "/products/tirzepatide" },
+    ],
+  },
+  {
+    label: "Skin & Longevity",
+    moreHref: "/start?category=skin-longevity",
+    children: [
+      { label: "NAD+", href: "/products/nad" },
+      { label: "GHK-Cu", href: "/products/ghk-cu" },
+      { label: "RESTORE", href: "/products/restore" },
+    ],
+  },
+  {
+    label: "Hormonal Health",
+    moreHref: "/start?category=hormonal-health",
+    children: [
+      { label: "PT-141", href: "/products/pt-141" },
+      { label: "Kisspeptin", href: "/products/kisspeptin" },
+    ],
+  },
+  {
+    label: "Cognitive",
+    moreHref: "/start?category=cognitive",
+    children: [
+      { label: "Semax", href: "/products/semax" },
+      { label: "Selank", href: "/products/selank" },
+      { label: "SEMAX/SELANK", href: "/products/semax-selank" },
+    ],
+  },
+];
+
 /** Default content for the home page (stands in for the Storyblok story). */
 export const siteHeader: SiteHeaderContent = {
   tickerMessages: [
@@ -451,6 +529,8 @@ export const siteHeader: SiteHeaderContent = {
     { label: "Protocols", href: "/products/bpc-157", hasDropdown: true },
     { label: "Learn", href: "/journal", hasDropdown: true },
   ],
+  resourcesEyebrow: "Resources",
+  protocolCategories: defaultProtocolCategories,
   loginLabel: "Login",
   loginHref: "/login",
   ctaLabel: "Start Your Protocol",

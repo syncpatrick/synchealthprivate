@@ -144,9 +144,20 @@ export const components = [
     image: asset(),
     alt: text(),
   })),
+  comp("nav_sub_link", "Nav sub link", () => ({
+    label: text(),
+    href: text(),
+  })),
+  comp("protocol_category", "Protocol category", () => ({
+    label: text(),
+    children: bloks(["nav_sub_link"]),
+    moreHref: text(),
+  })),
   comp("site_header", "Site header", () => ({
     tickerMessages: bloks(["text_item"]),
     navLinks: bloks(["nav_link"]),
+    resourcesEyebrow: text(),
+    protocolCategories: bloks(["protocol_category"]),
     loginLabel: text(),
     loginHref: text(),
     ctaLabel: text(),

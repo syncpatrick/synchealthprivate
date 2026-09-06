@@ -29,6 +29,7 @@ import {
   cartPage,
   cart,
   allProducts,
+  defaultProtocolCategories,
 } from "../src/lib/content.ts";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -36,12 +37,14 @@ const PUBLIC_DIR = path.join(ROOT, "public");
 
 /* --------------------------- env ---------------------------------------- */
 function loadEnv() {
-  const p = path.join(ROOT, ".env.local");
-  if (!fs.existsSync(p)) return;
-  for (const line of fs.readFileSync(p, "utf8").split("\n")) {
-    const m = line.match(/^\s*([A-Z0-9_]+)\s*=\s*(.*?)\s*$/);
-    if (m && !process.env[m[1]]) {
-      process.env[m[1]] = m[2].replace(/^["']|["']$/g, "");
+  for (const file of [".env", ".env.local"]) {
+    const p = path.join(ROOT, file);
+    if (!fs.existsSync(p)) continue;
+    for (const line of fs.readFileSync(p, "utf8").split("\n")) {
+      const m = line.match(/^\s*([A-Z0-9_]+)\s*=\s*(.*?)\s*$/);
+      if (m && !process.env[m[1]]) {
+        process.env[m[1]] = m[2].replace(/^["']|["']$/g, "");
+      }
     }
   }
 }
@@ -189,6 +192,16 @@ function buildBody() {
               label: l.label,
               href: l.href,
               hasDropdown: l.hasDropdown,
+            }),
+          ),
+          resourcesEyebrow: "Resources",
+          protocolCategories: defaultProtocolCategories.map((cat) =>
+            blk("protocol_category", {
+              label: cat.label,
+              moreHref: cat.moreHref || "",
+              children: cat.children.map((c) =>
+                blk("nav_sub_link", { label: c.label, href: c.href }),
+              ),
             }),
           ),
           loginLabel: s.header.loginLabel,

@@ -13,7 +13,6 @@ import { Faq } from "@/components/faq";
 import { FinalCta } from "@/components/final-cta";
 import { Footer } from "@/components/footer";
 import {
-  siteHeader,
   blankProduct,
   productsBySlug,
   testimonials,
@@ -22,7 +21,11 @@ import {
   finalCta,
   footer,
 } from "@/lib/content";
-import { getStoryContent, resolveVersion } from "@/lib/storyblok";
+import {
+  getStoryContent,
+  resolveVersion,
+  resolveSiteHeader,
+} from "@/lib/storyblok";
 import { mapProduct, mapTestimonials } from "@/lib/storyblok-map";
 import { Reveal } from "@/components/reveal";
 import { richToPlain } from "@/lib/richtext";
@@ -116,7 +119,10 @@ export default async function ProductPage({
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const { slug } = await params;
-  const product = await resolveProduct(slug, searchParams);
+  const [product, header] = await Promise.all([
+    resolveProduct(slug, searchParams),
+    resolveSiteHeader(searchParams),
+  ]);
   if (!product) notFound();
   const reviews =
     product.testimonials ?? (await fallbackTestimonials(searchParams));
@@ -124,7 +130,7 @@ export default async function ProductPage({
   return (
     <main className="min-h-screen overflow-x-clip bg-[linear-gradient(180deg,#f0f0e6_0%,#ffffff_100%)]">
       <div className="p-3">
-        <SiteHeader content={siteHeader} />
+        <SiteHeader content={header} />
       </div>
       {/* The hero is the first paint, so it is there rather than arriving.
           Everything below settles in as it is scrolled to, the same as the

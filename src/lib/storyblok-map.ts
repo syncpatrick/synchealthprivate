@@ -9,6 +9,8 @@ import {
   PDP_WHY_ICONS,
   TRUST_ICON,
   testimonials as siteTestimonials,
+  siteHeader,
+  type SiteHeaderContent,
 } from "@/lib/content";
 import { isRichDoc, richToPlain, type RichTextValue } from "@/lib/richtext";
 import { isQuizIcon } from "@/components/quiz/quiz-icons";
@@ -1040,5 +1042,40 @@ export function mapQuiz(content: Blok | null, fb: QuizContent): QuizContent {
       shape2: mapQuizReveal(arr(content.revealShape2)[0] ?? null, fb.reveal.shape2),
       shape3: mapQuizReveal(arr(content.revealShape3)[0] ?? null, fb.reveal.shape3),
     },
+  };
+}
+
+export function mapHeader(
+  blok?: Blok | null,
+  fallback: SiteHeaderContent = siteHeader,
+): SiteHeaderContent {
+  if (!blok) return fallback;
+  const rawCats = arr(blok.protocolCategories);
+  const ticker = arr(blok.tickerMessages);
+  const navLinks = arr(blok.navLinks);
+  return {
+    tickerMessages: ticker.length ? ticker.map((t) => str(t.text)) : fallback.tickerMessages,
+    navLinks: navLinks.length
+      ? navLinks.map((l) => ({
+          label: str(l.label),
+          href: str(l.href),
+          hasDropdown: bool(l.hasDropdown),
+        }))
+      : fallback.navLinks,
+    resourcesEyebrow: str(blok.resourcesEyebrow) || fallback.resourcesEyebrow,
+    protocolCategories: rawCats.length
+      ? rawCats.map((cat) => ({
+          label: str(cat.label),
+          moreHref: str(cat.moreHref) || undefined,
+          children: arr(cat.children).map((c) => ({
+            label: str(c.label),
+            href: str(c.href),
+          })),
+        }))
+      : fallback.protocolCategories,
+    loginLabel: str(blok.loginLabel) || fallback.loginLabel,
+    loginHref: str(blok.loginHref) || fallback.loginHref,
+    ctaLabel: str(blok.ctaLabel) || fallback.ctaLabel,
+    ctaHref: str(blok.ctaHref) || fallback.ctaHref,
   };
 }

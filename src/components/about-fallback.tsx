@@ -31,16 +31,21 @@ import {
   aboutBlog,
   aboutCta,
   footer,
+  type SiteHeaderContent,
 } from "@/lib/content";
 
-export function AboutFallback() {
+export function AboutFallback({
+  header = siteHeader,
+}: {
+  header?: SiteHeaderContent;
+} = {}) {
   return (
     // Cream → white wash on the page itself; the sections that carry their own
     // fill (how-it-works, compare, the dark quality band) paint over it, which
     // is how the Figma frame is built.
     <main className="min-h-screen overflow-clip bg-[linear-gradient(180deg,#F0F0E7_0%,#FFFFFF_100%)]">
       <div className="p-3">
-        <SiteHeader content={siteHeader} />
+        <SiteHeader content={header} />
       </div>
 
       <AboutHero content={aboutHero} />

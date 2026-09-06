@@ -2,7 +2,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { Search } from "lucide-react";
 import { ArrowIcon } from "@/components/arrow-icon";
-import { CartButton } from "@/components/cart-button";
 import { MobileMenu } from "@/components/mobile-menu";
 import { NavItem } from "@/components/nav-item";
 import { StickyNav } from "@/components/sticky-nav";
@@ -95,6 +94,8 @@ export function SiteHeader({ content }: { content: SiteHeaderContent }) {
                   href={link.href}
                   hasDropdown={link.hasDropdown}
                   cta={{ label: content.ctaLabel, href: content.ctaHref }}
+                  protocolCategories={content.protocolCategories}
+                  resourcesEyebrow={content.resourcesEyebrow}
                 />
               ))}
             </div>
@@ -127,8 +128,6 @@ export function SiteHeader({ content }: { content: SiteHeaderContent }) {
             >
               <Search className="size-5" aria-hidden />
             </button>
-
-            <CartButton />
 
             <Link
               href={content.loginHref}

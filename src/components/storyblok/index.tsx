@@ -29,12 +29,11 @@ import { FinalCta } from "@/components/final-cta";
 import { Footer } from "@/components/footer";
 import { Reveal } from "@/components/reveal";
 
-import type {
-  SiteHeaderContent,
-  CompareCell,
+import {
+  testimonials,
+  type CompareCell,
 } from "@/lib/content";
-import { testimonials } from "@/lib/content";
-import { mapTestimonials } from "@/lib/storyblok-map";
+import { mapTestimonials, mapHeader } from "@/lib/storyblok-map";
 import { isRichDoc, type RichTextValue } from "@/lib/richtext";
 
 /* ------------------------------------------------------------------ *
@@ -67,21 +66,6 @@ const alt = (v: unknown): string =>
  * component and forwards `storyblokEditable` for click-to-edit.
  * ------------------------------------------------------------------ */
 
-function mapHeader(blok?: SbBlokData): SiteHeaderContent {
-  const h = blok ?? ({} as SbBlokData);
-  return {
-    tickerMessages: arr(h.tickerMessages).map((t) => str(t.text)),
-    navLinks: arr(h.navLinks).map((l) => ({
-      label: str(l.label),
-      href: str(l.href),
-      hasDropdown: bool(l.hasDropdown),
-    })),
-    loginLabel: str(h.loginLabel),
-    loginHref: str(h.loginHref),
-    ctaLabel: str(h.ctaLabel),
-    ctaHref: str(h.ctaHref),
-  };
-}
 
 export function HeroBlok({ blok }: { blok: SbBlokData }) {
   return (

@@ -1,6 +1,9 @@
 import { cache } from "react";
+import { draftMode } from "next/headers";
 import { storyblokInit, apiPlugin } from "@storyblok/react/rsc";
 import { storyblokComponents } from "@/components/storyblok";
+import { siteHeader, type SiteHeaderContent } from "@/lib/content";
+import { mapHeader } from "@/lib/storyblok-map";
 
 const region = process.env.NEXT_PUBLIC_STORYBLOK_REGION || "eu";
 
@@ -85,5 +88,38 @@ export async function getStories(
   } catch (err) {
     console.error("[storyblok] failed to load stories:", err);
     return [];
+  }
+}
+
+/**
+ * Resolve the site header configuration. Fetches the header from Storyblok's
+ * `home` story so that header updates made in Storyblok (such as protocol
+ * categories and compound links) reflect across all pages.
+ * Falls back to the static siteHeader if Storyblok is not configured or unavailable.
+ */
+export async function resolveSiteHeader(
+  searchParams?:
+    | Promise<Record<string, string | string[] | undefined>>
+    | Record<string, string | string[] | undefined>,
+): Promise<SiteHeaderContent> {
+  if (!isStoryblokConfigured()) return siteHeader;
+  try {
+    const { isEnabled } = await draftMode();
+    const sp = searchParams ? await searchParams : undefined;
+    const version = resolveVersion(sp, isEnabled);
+    const homeContent = await getStoryContent("home", version);
+    if (!homeContent) return siteHeader;
+    const body = Array.isArray(homeContent.body)
+      ? (homeContent.body as Record<string, unknown>[])
+      : [];
+    const hero = body.find((b) => b?.component === "hero");
+    const headerBlok =
+      (Array.isArray(hero?.header) && (hero.header[0] as Record<string, unknown>)) ||
+      body.find((b) => b?.component === "site_header") ||
+      null;
+    return mapHeader(headerBlok, siteHeader);
+  } catch (err) {
+    console.error("[storyblok] failed to resolve site header:", err);
+    return siteHeader;
   }
 }

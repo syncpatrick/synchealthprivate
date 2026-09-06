@@ -5,7 +5,6 @@ import { SiteHeader } from "@/components/site-header";
 import { Footer } from "@/components/footer";
 import { LegalPage } from "@/components/legal-page";
 import {
-  siteHeader,
   footer,
   privacyPolicy,
   termsOfService,
@@ -13,7 +12,11 @@ import {
   refundPolicy,
   type LegalContent,
 } from "@/lib/content";
-import { getStoryContent, resolveVersion } from "@/lib/storyblok";
+import {
+  getStoryContent,
+  resolveVersion,
+  resolveSiteHeader,
+} from "@/lib/storyblok";
 import { mapLegal } from "@/lib/storyblok-map";
 import { richToPlain } from "@/lib/richtext";
 
@@ -96,14 +99,17 @@ export default async function LegalRoute({
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const { slug } = await params;
-  const content = await resolveLegal(slug, searchParams);
+  const [content, header] = await Promise.all([
+    resolveLegal(slug, searchParams),
+    resolveSiteHeader(searchParams),
+  ]);
   if (!content) notFound();
 
   return (
     <main className="min-h-screen overflow-clip bg-white">
       <div className="bg-[linear-gradient(180deg,#FCF8F1_0%,#FFFFFF_620px)]">
         <div className="p-3">
-          <SiteHeader content={siteHeader} />
+          <SiteHeader content={header} />
         </div>
         <LegalPage content={content} />
       </div>

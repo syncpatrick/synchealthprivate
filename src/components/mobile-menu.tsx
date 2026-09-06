@@ -7,8 +7,10 @@ import { Menu, X } from "lucide-react";
 import { ArrowIcon } from "@/components/arrow-icon";
 import {
   MENU_CATEGORY_LIMIT,
-  MOBILE_MENU_LINKS,
   MOBILE_MENU_PROMO,
+  PROTOCOL_CATEGORIES,
+  LEARN_LINKS,
+  type NavGroup,
 } from "@/components/nav-links";
 import type { SiteHeaderContent } from "@/lib/content";
 
@@ -95,6 +97,23 @@ export function MobileMenu({ content }: { content: SiteHeaderContent }) {
 
   const close = () => setOpen(false);
 
+  const categories: NavGroup[] = content.protocolCategories?.length
+    ? content.protocolCategories.map((c) => ({
+      label: c.label,
+      children: c.children ?? [],
+      moreHref: c.moreHref,
+    }))
+    : PROTOCOL_CATEGORIES.map((c) => ({
+      label: c.label,
+      children: c.children ?? [],
+      moreHref: c.moreHref,
+    }));
+
+  const menuLinks: NavGroup[] = [
+    ...categories,
+    { label: "Learn", children: LEARN_LINKS, moreHref: undefined },
+  ];
+
   return (
     <>
       <button
@@ -109,32 +128,35 @@ export function MobileMenu({ content }: { content: SiteHeaderContent }) {
 
       {open &&
         createPortal(
-          <div className="overlay-viewport fixed inset-0 z-[60] flex flex-col bg-cream md:hidden">
-            {/* Title bar */}
-            <div className="flex shrink-0 items-center gap-2 px-5 pt-5">
-              <span className="flex-1 font-mono text-xl leading-9 tracking-[-0.03em] text-ink">
-                MENU
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-label="Site navigation"
+            className="fixed inset-0 z-50 flex flex-col bg-cream"
+          >
+            {/* Header: MENU + close */}
+            <div className="flex items-center justify-between border-b border-ink/[0.08] px-5 py-3">
+              <span className="font-mono text-sm font-medium uppercase tracking-[0.08em] text-ink">
+                Menu
               </span>
               <button
                 type="button"
                 aria-label="Close menu"
                 onClick={close}
-                className="-mr-3 grid size-12 shrink-0 place-items-center text-ink"
+                className="rounded-full p-2 text-ink/80 transition-colors hover:bg-white/60"
               >
-                <X className="size-6" strokeWidth={1.5} aria-hidden />
+                <X className="size-5" aria-hidden />
               </button>
             </div>
 
             {/* Categories + Login */}
             <div className="flex flex-1 flex-col gap-9 overflow-y-auto p-5">
               <nav className="flex flex-col gap-1">
-                {MOBILE_MENU_LINKS.map((link) => {
+                {menuLinks.map((link) => {
                   const isOpen = expanded === link.label;
-                  // Same cut-off as the desktop mega-menu, so a category does
-                  // not read as two different lists depending on the device.
-                  const shown = link.children.slice(0, MENU_CATEGORY_LIMIT);
-                  const overflows =
-                    link.children.length > MENU_CATEGORY_LIMIT;
+                  const children = link.children ?? [];
+                  const shown = children.slice(0, MENU_CATEGORY_LIMIT);
+                  const overflows = children.length > MENU_CATEGORY_LIMIT;
                   return (
                     <div
                       key={link.label}
@@ -154,9 +176,8 @@ export function MobileMenu({ content }: { content: SiteHeaderContent }) {
                         </span>
                         {/* The Figma's right arrow, swung down while open. */}
                         <ArrowIcon
-                          className={`size-9 shrink-0 transition-transform ${
-                            isOpen ? "rotate-90" : ""
-                          }`}
+                          className={`size-9 shrink-0 transition-transform ${isOpen ? "rotate-90" : ""
+                            }`}
                         />
                       </button>
 

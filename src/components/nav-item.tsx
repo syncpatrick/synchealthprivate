@@ -101,13 +101,20 @@ export function NavItem({
   href,
   hasDropdown,
   cta,
+  protocolCategories,
+  resourcesEyebrow,
 }: {
   label: string;
   href: string;
   hasDropdown?: boolean;
   cta: { label: string; href: string };
+  protocolCategories?: NavGroup[];
+  resourcesEyebrow?: string;
 }) {
-  const menu = menuForLabel(label);
+  const menu = menuForLabel(label, {
+    categories: protocolCategories,
+    eyebrow: resourcesEyebrow,
+  });
   const [open, setOpen] = useState(false);
   // One category expanded at a time keeps the panel from growing unbounded.
   const [expanded, setExpanded] = useState<string | null>(null);

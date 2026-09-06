@@ -3,8 +3,13 @@ import { draftMode } from "next/headers";
 import { SiteHeader } from "@/components/site-header";
 import { Footer } from "@/components/footer";
 import { JournalPage } from "@/components/journal-page";
-import { siteHeader, journal, footer } from "@/lib/content";
-import { getStoryContent, getStories, resolveVersion } from "@/lib/storyblok";
+import { journal, footer } from "@/lib/content";
+import {
+  getStoryContent,
+  getStories,
+  resolveVersion,
+  resolveSiteHeader,
+} from "@/lib/storyblok";
 import {
   mapJournal,
   mapArticleStoryCard,
@@ -86,12 +91,14 @@ export default async function JournalRoute({
     articles: listed.map(withCover),
   };
 
+  const header = await resolveSiteHeader(searchParams);
+
   return (
     <main className="min-h-screen overflow-clip bg-white">
       {/* Cream → white wash behind the header + journal index (Figma gradient). */}
       <div className="bg-[linear-gradient(180deg,#FCF8F1_0%,#FFFFFF_620px)]">
         <div className="p-3">
-          <SiteHeader content={siteHeader} />
+          <SiteHeader content={header} />
         </div>
         <JournalPage content={content} />
       </div>

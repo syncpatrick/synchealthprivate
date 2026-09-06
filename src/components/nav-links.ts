@@ -111,16 +111,25 @@ export const MOBILE_MENU_PROMO = {
 };
 
 /** Resolve a top-level nav label to its mega-menu group, if any. */
-export function menuForLabel(label: string): {
+export function menuForLabel(
+  label: string,
+  options?: {
+    categories?: NavGroup[];
+    eyebrow?: string;
+  },
+): {
   eyebrow: string;
   groups: NavGroup[];
 } | null {
-  // The Figma draws only five categories here and puts Weight on the mobile
-  // drawer alone (190:2797), which left semaglutide and tirzepatide with no
-  // path from the desktop nav — so both menus list every category instead.
-  // Cognitive arrived after the Figma and is not drawn there at all.
-  if (label === "Protocols")
-    return { eyebrow: "Resources", groups: PROTOCOL_CATEGORIES };
+  if (label === "Protocols") {
+    const groups = options?.categories?.length
+      ? options.categories.map((c) => ({
+          ...c,
+          moreHref: c.moreHref || `/start?category=${categorySlug(c.label)}`,
+        }))
+      : PROTOCOL_CATEGORIES;
+    return { eyebrow: options?.eyebrow || "Resources", groups };
+  }
   if (label === "Learn") return { eyebrow: "Learn", groups: LEARN_LINKS };
   return null;
 }

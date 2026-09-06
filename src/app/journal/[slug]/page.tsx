@@ -5,13 +5,16 @@ import { SiteHeader } from "@/components/site-header";
 import { Footer } from "@/components/footer";
 import { ArticlePage } from "@/components/article-page";
 import {
-  siteHeader,
   articlesBySlug,
   blankArticle,
   journal,
   footer,
 } from "@/lib/content";
-import { getStoryContent, resolveVersion } from "@/lib/storyblok";
+import {
+  getStoryContent,
+  resolveVersion,
+  resolveSiteHeader,
+} from "@/lib/storyblok";
 import {
   mapArticle,
   mapJournal,
@@ -95,14 +98,17 @@ export default async function ArticleRoute({
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const { slug } = await params;
-  const content = await resolveArticle(slug, searchParams);
+  const [content, header] = await Promise.all([
+    resolveArticle(slug, searchParams),
+    resolveSiteHeader(searchParams),
+  ]);
   if (!content) notFound();
 
   return (
     <main className="min-h-screen overflow-clip bg-white">
       <div className="bg-[linear-gradient(180deg,#FCF8F1_0%,#FFFFFF_620px)]">
         <div className="p-3">
-          <SiteHeader content={siteHeader} />
+          <SiteHeader content={header} />
         </div>
         <ArticlePage content={content} />
       </div>

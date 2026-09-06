@@ -2,7 +2,11 @@ import type { Metadata } from "next";
 import { draftMode } from "next/headers";
 import { StoryblokStory } from "@storyblok/react/rsc";
 import type { ISbStoryData } from "@storyblok/react/rsc";
-import { getStoryblok, isStoryblokConfigured } from "@/lib/storyblok";
+import {
+  getStoryblok,
+  isStoryblokConfigured,
+  resolveSiteHeader,
+} from "@/lib/storyblok";
 import { StartFallback } from "@/components/start-fallback";
 
 // Draft content (Visual Editor / preview) must render fresh on every request.
@@ -36,16 +40,20 @@ export default async function StartRoute({
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
+  const [sp, header] = await Promise.all([
+    searchParams,
+    resolveSiteHeader(searchParams),
+  ]);
+
   // Falls back to the local content whenever Storyblok is unconfigured or the
   // story is missing, so the page never renders blank.
-  if (!isStoryblokConfigured()) return <StartFallback />;
+  if (!isStoryblokConfigured()) return <StartFallback header={header} />;
 
-  const sp = await searchParams;
   const { isEnabled } = await draftMode();
   const version: "draft" | "published" =
     sp._storyblok || isEnabled ? "draft" : "published";
 
   const story = await fetchStory(version);
-  if (!story) return <StartFallback />;
+  if (!story) return <StartFallback header={header} />;
   return <StoryblokStory story={story} />;
 }
