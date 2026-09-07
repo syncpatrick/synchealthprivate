@@ -73,6 +73,7 @@ export const components = [
     number: text(),
     title: text(),
     description: textarea(),
+    image: asset(),
   })),
   comp("protocol_card", "Protocol card", () => ({
     image: asset(),
