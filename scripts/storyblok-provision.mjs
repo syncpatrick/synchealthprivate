@@ -394,9 +394,16 @@ async function upsertStory(name, slug, content, realPath) {
   // when editing. (`real_path` in the API is read-only/computed.)
   const story = { name, slug, content };
   if (realPath) story.path = realPath;
+  const FORCE_SEED =
+    process.argv.includes("--force-seed") || process.env.FORCE_SEED === "true";
+
   if (existing) {
-    await Storyblok.put(`${base}/stories/${existing.id}`, { story, publish: 1 });
-    console.log(`  ✔ ${name} (/${slug}) updated & published`);
+    if (FORCE_SEED) {
+      await Storyblok.put(`${base}/stories/${existing.id}`, { story, publish: 1 });
+      console.log(`  ✔ ${name} (/${slug}) re-seeded & published (--force-seed)`);
+    } else {
+      console.log(`  · ${name} (/${slug}) already exists — content preserved`);
+    }
   } else {
     const res = await Storyblok.post(`${base}/stories`, { story, publish: 1 });
     _storyList.push({ id: res.data.story.id, slug });
