@@ -2,8 +2,13 @@ import { cache } from "react";
 import { draftMode } from "next/headers";
 import { storyblokInit, apiPlugin } from "@storyblok/react/rsc";
 import { storyblokComponents } from "@/components/storyblok";
-import { siteHeader, type SiteHeaderContent } from "@/lib/content";
-import { mapHeader } from "@/lib/storyblok-map";
+import {
+  siteHeader,
+  type SiteHeaderContent,
+  footer as siteFooter,
+  type FooterContent,
+} from "@/lib/content";
+import { mapHeader, mapFooter } from "@/lib/storyblok-map";
 
 const region = process.env.NEXT_PUBLIC_STORYBLOK_REGION || "eu";
 
@@ -123,3 +128,50 @@ export async function resolveSiteHeader(
     return siteHeader;
   }
 }
+
+/**
+  * Resolve the site footer configuration. Fetches the footer from Storyblok's
+  * `site-footer` story (or falls back to the `home` story footer blok) so that
+  * footer updates made in Storyblok reflect across all pages.
+  * Falls back to the static siteFooter if Storyblok is not configured or unavailable.
+  */
+export async function resolveFooter(
+  searchParams?:
+    | Promise<Record<string, string | string[] | undefined>>
+    | Record<string, string | string[] | undefined>,
+): Promise<FooterContent> {
+  if (!isStoryblokConfigured()) return siteFooter;
+  try {
+    const { isEnabled } = await draftMode();
+    const sp = searchParams ? await searchParams : undefined;
+    const version = resolveVersion(sp, isEnabled);
+
+    // 1. Check for dedicated site-footer story first (if it exists)
+    const footerStory = await getStoryContent("site-footer", version);
+    if (footerStory) {
+      const blok =
+        footerStory.component === "footer"
+          ? (footerStory as Record<string, unknown>)
+          : Array.isArray(footerStory.body)
+            ? (footerStory.body as Record<string, unknown>[]).find((b) => b?.component === "footer")
+            : null;
+      if (blok) return mapFooter(blok, siteFooter);
+    }
+
+    // 2. Fall back to the home story's footer blok
+    const homeContent = await getStoryContent("home", version);
+    if (homeContent) {
+      const body = Array.isArray(homeContent.body)
+        ? (homeContent.body as Record<string, unknown>[])
+        : [];
+      const footerBlok = body.find((b) => b?.component === "footer") || null;
+      if (footerBlok) return mapFooter(footerBlok, siteFooter);
+    }
+
+    return siteFooter;
+  } catch (err) {
+    console.error("[storyblok] failed to resolve footer:", err);
+    return siteFooter;
+  }
+}
+

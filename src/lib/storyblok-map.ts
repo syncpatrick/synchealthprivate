@@ -11,6 +11,9 @@ import {
   testimonials as siteTestimonials,
   siteHeader,
   type SiteHeaderContent,
+  footer as siteFooter,
+  type FooterContent,
+  type SocialLink,
 } from "@/lib/content";
 import { isRichDoc, richToPlain, type RichTextValue } from "@/lib/richtext";
 import { isQuizIcon } from "@/components/quiz/quiz-icons";
@@ -1077,5 +1080,53 @@ export function mapHeader(
     loginHref: str(blok.loginHref) || fallback.loginHref,
     ctaLabel: str(blok.ctaLabel) || fallback.ctaLabel,
     ctaHref: str(blok.ctaHref) || fallback.ctaHref,
+  };
+}
+
+export function mapFooter(
+  blok?: Blok | null,
+  fallback: FooterContent = siteFooter,
+): FooterContent {
+  if (!blok) return fallback;
+  const rawSocials = arr(blok.socials);
+  const rawNavCols = arr(blok.navColumns);
+  const rawPayments = arr(blok.payments);
+
+  const socials = rawSocials.length
+    ? (rawSocials
+        .map((s) => ({ name: str(s.name), href: str(s.href) }))
+        .filter((s) =>
+          ["instagram", "linkedin", "facebook", "youtube"].includes(s.name),
+        ) as SocialLink[])
+    : fallback.socials;
+
+  const navColumns = rawNavCols.length
+    ? rawNavCols.map((col) => ({
+        links: arr(col.links).map((l) => ({
+          label: str(l.label),
+          href: str(l.href),
+          muted: bool(l.muted),
+        })),
+      }))
+    : fallback.navColumns;
+
+  const payments = rawPayments.length
+    ? rawPayments.map((p) => ({
+        src: img(p.src) || img(p.image) || str(p.src),
+        alt: str(p.alt),
+      }))
+    : fallback.payments;
+
+  return {
+    tagline: str(blok.tagline) || fallback.tagline,
+    socials,
+    navColumns,
+    newsletter: {
+      text: str(blok.newsletterText) || fallback.newsletter.text,
+      placeholder: str(blok.newsletterPlaceholder) || fallback.newsletter.placeholder,
+      ctaLabel: str(blok.newsletterCta) || fallback.newsletter.ctaLabel,
+    },
+    disclaimer: rich(blok.disclaimer) || fallback.disclaimer,
+    payments,
   };
 }

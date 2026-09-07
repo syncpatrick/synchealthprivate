@@ -5,7 +5,6 @@ import { SiteHeader } from "@/components/site-header";
 import { Footer } from "@/components/footer";
 import { LegalPage } from "@/components/legal-page";
 import {
-  footer,
   privacyPolicy,
   termsOfService,
   shippingPolicy,
@@ -16,6 +15,7 @@ import {
   getStoryContent,
   resolveVersion,
   resolveSiteHeader,
+  resolveFooter,
 } from "@/lib/storyblok";
 import { mapLegal } from "@/lib/storyblok-map";
 import { richToPlain } from "@/lib/richtext";
@@ -99,9 +99,10 @@ export default async function LegalRoute({
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const { slug } = await params;
-  const [content, header] = await Promise.all([
+  const [content, header, footer] = await Promise.all([
     resolveLegal(slug, searchParams),
     resolveSiteHeader(searchParams),
+    resolveFooter(searchParams),
   ]);
   if (!content) notFound();
 

@@ -19,12 +19,12 @@ import {
   catalog,
   blog,
   finalCta,
-  footer,
 } from "@/lib/content";
 import {
   getStoryContent,
   resolveVersion,
   resolveSiteHeader,
+  resolveFooter,
 } from "@/lib/storyblok";
 import { mapProduct, mapTestimonials } from "@/lib/storyblok-map";
 import { Reveal } from "@/components/reveal";
@@ -64,8 +64,8 @@ async function resolveProduct(
   const version = resolveVersion(await searchParams, isEnabled);
   const local = productsBySlug[slug];
   const story =
-    (await getStoryContent(`products/${slug}`, version)) ??
-    (await getStoryContent(`product-${slug}`, version));
+    (await getStoryContent(`product-${slug}`, version)) ??
+    (await getStoryContent(`products/${slug}`, version));
   if (!story && !local) return null;
   return { ...mapProduct(story, local ?? blankProduct), slug };
 }
@@ -119,9 +119,10 @@ export default async function ProductPage({
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const { slug } = await params;
-  const [product, header] = await Promise.all([
+  const [product, header, footer] = await Promise.all([
     resolveProduct(slug, searchParams),
     resolveSiteHeader(searchParams),
+    resolveFooter(searchParams),
   ]);
   if (!product) notFound();
   const reviews =

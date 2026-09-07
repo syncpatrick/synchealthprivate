@@ -3,11 +3,12 @@ import { draftMode } from "next/headers";
 import { SiteHeader } from "@/components/site-header";
 import { Footer } from "@/components/footer";
 import { CartPageBody } from "@/components/cart-page";
-import { cartPage, catalog, footer } from "@/lib/content";
+import { cartPage, catalog } from "@/lib/content";
 import {
   getStoryContent,
   resolveVersion,
   resolveSiteHeader,
+  resolveFooter,
 } from "@/lib/storyblok";
 import { mapCartPage } from "@/lib/storyblok-map";
 
@@ -23,10 +24,11 @@ export default async function CartPage({
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  const [sp, { isEnabled }, header] = await Promise.all([
+  const [sp, { isEnabled }, header, footer] = await Promise.all([
     searchParams,
     draftMode(),
     resolveSiteHeader(searchParams),
+    resolveFooter(searchParams),
   ]);
   const content = mapCartPage(
     await getStoryContent("cart", resolveVersion(sp, isEnabled)),

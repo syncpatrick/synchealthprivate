@@ -3,12 +3,13 @@ import { draftMode } from "next/headers";
 import { SiteHeader } from "@/components/site-header";
 import { Footer } from "@/components/footer";
 import { JournalPage } from "@/components/journal-page";
-import { journal, footer } from "@/lib/content";
+import { journal } from "@/lib/content";
 import {
   getStoryContent,
   getStories,
   resolveVersion,
   resolveSiteHeader,
+  resolveFooter,
 } from "@/lib/storyblok";
 import {
   mapJournal,
@@ -91,7 +92,10 @@ export default async function JournalRoute({
     articles: listed.map(withCover),
   };
 
-  const header = await resolveSiteHeader(searchParams);
+  const [header, footer] = await Promise.all([
+    resolveSiteHeader(searchParams),
+    resolveFooter(searchParams),
+  ]);
 
   return (
     <main className="min-h-screen overflow-clip bg-white">

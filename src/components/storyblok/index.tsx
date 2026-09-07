@@ -33,7 +33,7 @@ import {
   testimonials,
   type CompareCell,
 } from "@/lib/content";
-import { mapTestimonials, mapHeader } from "@/lib/storyblok-map";
+import { mapTestimonials, mapHeader, mapFooter } from "@/lib/storyblok-map";
 import { isRichDoc, type RichTextValue } from "@/lib/richtext";
 
 /* ------------------------------------------------------------------ *
@@ -532,36 +532,10 @@ export function FinalCtaBlok({ blok }: { blok: SbBlokData }) {
 }
 
 export function FooterBlok({ blok }: { blok: SbBlokData }) {
-  const socials = arr(blok.socials)
-    .map((s) => ({ name: str(s.name), href: str(s.href) }))
-    .filter((s) =>
-      ["instagram", "linkedin", "facebook", "youtube"].includes(s.name),
-    ) as { name: "instagram" | "linkedin" | "facebook" | "youtube"; href: string }[];
-
   return (
     <Footer
       {...storyblokEditable(blok)}
-      content={{
-        tagline: str(blok.tagline),
-        socials,
-        navColumns: arr(blok.navColumns).map((col) => ({
-          links: arr(col.links).map((l) => ({
-            label: str(l.label),
-            href: str(l.href),
-            muted: bool(l.muted),
-          })),
-        })),
-        newsletter: {
-          text: str(blok.newsletterText),
-          placeholder: str(blok.newsletterPlaceholder),
-          ctaLabel: str(blok.newsletterCta),
-        },
-        disclaimer: rich(blok.disclaimer),
-        payments: arr(blok.payments).map((p) => ({
-          src: img(p.image),
-          alt: str(p.alt) || alt(p.image),
-        })),
-      }}
+      content={mapFooter(blok as Record<string, unknown>)}
     />
   );
 }

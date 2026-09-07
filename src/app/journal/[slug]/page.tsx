@@ -8,12 +8,12 @@ import {
   articlesBySlug,
   blankArticle,
   journal,
-  footer,
 } from "@/lib/content";
 import {
   getStoryContent,
   resolveVersion,
   resolveSiteHeader,
+  resolveFooter,
 } from "@/lib/storyblok";
 import {
   mapArticle,
@@ -98,9 +98,10 @@ export default async function ArticleRoute({
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const { slug } = await params;
-  const [content, header] = await Promise.all([
+  const [content, header, footer] = await Promise.all([
     resolveArticle(slug, searchParams),
     resolveSiteHeader(searchParams),
+    resolveFooter(searchParams),
   ]);
   if (!content) notFound();
 
